@@ -37,34 +37,47 @@ function TaskPanel({ tasks }: { tasks: Task[] }) {
 }
 
 export default function App() {
-  const [state, setState] = useState<SmartTaskState>({
+  const [agentState, setAgentState] = useState<SmartTaskState>({
     tasks: [],
     userName: null,
   });
 
   const agent = useAgent({
     agent: "smart-task-agent",
-    onStateUpdate: (newState: SmartTaskState) => setState(newState),
+    name: "v2",
+    onStateUpdate: (newState: SmartTaskState) => setAgentState(newState),
   });
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useAgentChat({
-      agent,
-    });
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isStreaming,
+    status,
+    clearHistory,
+  } = useAgentChat({ agent }) as any;
+
+  const isLoading = status === "submitted" || status === "streaming" || isStreaming;
 
   return (
     <div className="app">
       <header className="header">
         <h1>⚡ SmartTask AI</h1>
         <p>
-          {state.userName
-            ? `Hey ${state.userName}! Let's get things done.`
+          {agentState.userName
+            ? `Hey ${agentState.userName}! Let's get things done.`
             : "Your AI-powered productivity assistant"}
         </p>
+        {messages.length > 0 && (
+          <button className="clear-btn" onClick={clearHistory} title="Clear chat history">
+            Clear
+          </button>
+        )}
       </header>
 
       <div className="main-layout">
-        <TaskPanel tasks={state.tasks} />
+        <TaskPanel tasks={agentState.tasks} />
 
         <div className="chat-container">
           <div className="messages">
@@ -80,17 +93,17 @@ export default function App() {
                 <p>Try saying: <em>"Add a high priority task to finish the report"</em></p>
               </div>
             )}
-            {messages.map((msg) => (
+            {messages.map((msg: any) => (
               <div key={msg.id} className={`message ${msg.role}`}>
                 <div className="message-bubble">
-                  {msg.parts?.map((part, i) => {
+                  {msg.parts?.map((part: any, i: number) => {
                     if (part.type === "text") {
                       return <span key={i}>{part.text}</span>;
                     }
                     if (part.type === "tool-invocation") {
                       return (
                         <span key={i} className="tool-badge">
-                          🔧 {part.toolInvocation.toolName}
+                          🔧 {part.toolInvocation?.toolName}
                         </span>
                       );
                     }
@@ -118,7 +131,7 @@ export default function App() {
               placeholder="Ask me to add a task, give a tip, or anything..."
               disabled={isLoading}
             />
-            <button type="submit" disabled={isLoading || !input.trim()}>
+            <button type="submit" disabled={isLoading || !input?.trim()}>
               Send
             </button>
           </form>
