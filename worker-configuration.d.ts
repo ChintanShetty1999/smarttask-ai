@@ -1,4 +1,5 @@
 interface Env {
   AI: Ai;
-  SMARTTASK_AGENT: DurableObjectNamespace;
+  SmartTaskAgent: DurableObjectNamespace;
+  ASSETS: Fetcher;
 }

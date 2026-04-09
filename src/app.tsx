@@ -43,7 +43,7 @@ export default function App() {
   });
 
   const agent = useAgent({
-    agent: "SmartTaskAgent",
+    agent: "smart-task-agent",
     onStateUpdate: (newState: SmartTaskState) => setState(newState),
   });
 

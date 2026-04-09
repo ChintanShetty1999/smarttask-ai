@@ -10,7 +10,7 @@ binding = "AI"
 
 [durable_objects]
 bindings = [
-  { name = "SMARTTASK_AGENT", class_name = "SmartTaskAgent" }
+  { name = "SmartTaskAgent", class_name = "SmartTaskAgent" }
 ]
 
 [[migrations]]
