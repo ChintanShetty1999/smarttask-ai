@@ -41,24 +41,31 @@ export default function App() {
     tasks: [],
     userName: null,
   });
+  const [input, setInput] = useState("");
 
   const agent = useAgent({
     agent: "smart-task-agent",
-    name: "v2",
+    name: "v5",
     onStateUpdate: (newState: SmartTaskState) => setAgentState(newState),
   });
 
   const {
     messages,
-    input,
-    handleInputChange,
-    handleSubmit,
+    sendMessage,
     isStreaming,
     status,
     clearHistory,
   } = useAgentChat({ agent }) as any;
 
   const isLoading = status === "submitted" || status === "streaming" || isStreaming;
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text || isLoading) return;
+    sendMessage({ text });
+    setInput("");
+  }
 
   return (
     <div className="app">
@@ -127,11 +134,11 @@ export default function App() {
             <input
               type="text"
               value={input}
-              onChange={handleInputChange}
+              onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me to add a task, give a tip, or anything..."
               disabled={isLoading}
             />
-            <button type="submit" disabled={isLoading || !input?.trim()}>
+            <button type="submit" disabled={isLoading || !input.trim()}>
               Send
             </button>
           </form>
