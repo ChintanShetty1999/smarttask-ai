@@ -1,4 +1,5 @@
 import { AIChatAgent } from "agents/ai-chat-agent";
+import { routeAgentRequest } from "agents";
 import { createWorkersAI } from "workers-ai-provider";
 import { streamText, convertToModelMessages } from "ai";
 import { tools } from "./tools";
@@ -122,7 +123,9 @@ Always be encouraging and positive about their progress!`;
 
 export default {
   async fetch(request: Request, env: Env) {
-    // The Agents SDK + Vite plugin handles routing automatically
-    return (env.SMARTTASK_AGENT as any).fetch(request);
+    return (
+      (await routeAgentRequest(request, env)) ??
+      env.ASSETS.fetch(request)
+    );
   },
 } satisfies ExportedHandler<Env>;
